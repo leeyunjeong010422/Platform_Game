@@ -20,8 +20,6 @@ public class PlayerController : MonoBehaviour
 
     private IPlayerState currentState;
 
-    //private float x;
-
     public static int idleHash = Animator.StringToHash("Idle");
     public static int runHash = Animator.StringToHash("Run");
     public static int jumpHash = Animator.StringToHash("Jump");
