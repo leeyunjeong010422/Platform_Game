@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] public GameManager gameManager;
     [SerializeField] public SoundManager soundManager;
+    [SerializeField] public PetController petController;
 
     [SerializeField] public Rigidbody2D rigid;
     [SerializeField] public SpriteRenderer spriteRenderer;
@@ -149,7 +150,14 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                ChangeState(new DamagedState(collision.transform.position));
+                if (petController != null && petController.isActive)
+                {
+                    petController.TakeDamage();
+                }
+                else
+                {
+                    ChangeState(new DamagedState(collision.transform.position));
+                }
             }
         }
     }

@@ -5,13 +5,15 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip bgmClip;
     [SerializeField] private AudioClip coinClip;
     [SerializeField] private AudioClip monsterDieClip;
+    [SerializeField] private AudioClip petGetClip;
+    [SerializeField] private AudioClip petDieClip;
     private AudioSource audioSource;
 
     private void Awake()
     {
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.clip = bgmClip;
-        audioSource.loop = true; //반복재생
+        audioSource.loop = true;
     }
 
     private void Start()
@@ -43,5 +45,15 @@ public class SoundManager : MonoBehaviour
     public void PlayMonsterDieSound()
     {
         audioSource.PlayOneShot(monsterDieClip);
+    }
+
+    public void PlayPetGetSound()
+    {
+        audioSource.PlayOneShot(petGetClip);
+    }
+
+    public void PlayPetDieSound()
+    {
+        audioSource.PlayOneShot(petDieClip);
     }
 }

@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI; // Ãß°¡
 
 public class GameManager : MonoBehaviour
 {
@@ -9,10 +10,13 @@ public class GameManager : MonoBehaviour
     public int stageIndex;
     public int health = 3;
     public PlayerController player;
+    [SerializeField] SoundManager soundManager;
 
     [SerializeField] TextMeshProUGUI gameOverText;
     [SerializeField] TextMeshProUGUI gameClearText;
     [SerializeField] TextMeshProUGUI scoreText;
+
+    [SerializeField] private Image[] hearts;
 
     private bool reStart = false;
 
@@ -20,6 +24,7 @@ public class GameManager : MonoBehaviour
     {
         player = FindObjectOfType<PlayerController>();
         UpdateScoreUI();
+        UpdateHealthUI();
     }
 
     private void Update()
@@ -49,8 +54,8 @@ public class GameManager : MonoBehaviour
 
             collision.transform.position = new Vector3(-6, -1.56f, -1);
         }
-
     }
+
     public void AddScore(int points)
     {
         stagePoint += points;
@@ -68,13 +73,29 @@ public class GameManager : MonoBehaviour
         if (health > 0)
         {
             health--;
+            UpdateHealthUI();
         }
         else
         {
             player.OnDie();
-
+            soundManager.StopBGM();
             gameOverText.gameObject.SetActive(true);
             reStart = true;
+        }
+    }
+
+    private void UpdateHealthUI()
+    {
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (i < health)
+            {
+                hearts[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                hearts[i].gameObject.SetActive(false);
+            }
         }
     }
 }
