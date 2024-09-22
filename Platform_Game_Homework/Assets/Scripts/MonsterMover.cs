@@ -1,14 +1,18 @@
-using UnityEngine;
+癤퓎sing UnityEngine;
 
 public class MonsterMover : MonoBehaviour
 {
-    [SerializeField] Rigidbody2D rigid;
-    [SerializeField] Animator animator;
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] CircleCollider2D collider2d;
+    [SerializeField] public Rigidbody2D rigid;
+    [SerializeField] public Animator animator;
+    [SerializeField] public SpriteRenderer spriteRenderer;
+    [SerializeField] public CircleCollider2D collider2d;
 
-    [SerializeField] int nextMove;
-    [SerializeField] float speed;
+    public int nextMove;
+    public float speed;
+
+    private MonsterStateBase currentState;
+    private RandomMoveState_M randomState = new RandomMoveState_M();
+    private DamagedState_M damagedState = new DamagedState_M();
 
     private void Awake()
     {
@@ -17,42 +21,33 @@ public class MonsterMover : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         collider2d = GetComponent<CircleCollider2D>();
 
-        Invoke("RandomMove", 3);
+        ChangeState(randomState);
     }
 
     private void FixedUpdate()
     {
-        //왼쪽으로 이동시킴
-        rigid.velocity = new Vector2(nextMove * speed, rigid.velocity.y);
-
-        Vector2 frontVector = new Vector2(rigid.position.x + nextMove * 0.2f, rigid.position.y);
-
-        Debug.DrawRay(frontVector, Vector3.down, new Color(0, 1, 0));
-
-        //레이캐스트로 앞에 땅을 확인해서
-        RaycastHit2D hit = Physics2D.Raycast(frontVector, Vector3.down, 1, LayerMask.GetMask("Ground"));
-
-        if (hit.collider == null)
-        {
-            Turn(); //땅이 아니면 방향을 전환함
-        }
+        currentState.Update(this);
     }
 
-    private void RandomMove() //몬스터를 무작위로 움직이게 함
+    public void ChangeState(MonsterStateBase newState)
     {
-        nextMove = Random.Range(-1, 2); // -1, 0, 1 사이
+        if (currentState != null)
+            currentState.Exit(this);
 
+        currentState = newState;
+        currentState.Enter(this);
+    }
+
+    private void RandomMove()
+    {
+        nextMove = Random.Range(-1, 2);
         animator.SetInteger("WalkSpeed", nextMove);
-
-        if (nextMove != 0)
-        {
-            spriteRenderer.flipX = nextMove == 1;
-        }
+        spriteRenderer.flipX = nextMove == 1;
 
         Invoke("RandomMove", 3);
     }
 
-    private void Turn()
+    public void Turn()
     {
         nextMove *= -1;
         spriteRenderer.flipX = nextMove == 1;
@@ -61,18 +56,9 @@ public class MonsterMover : MonoBehaviour
         Invoke("RandomMove", 3);
     }
 
-    //플레이어에게 피해를 받으면
     public void OnDamaged()
     {
-        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-
-        spriteRenderer.flipY = true;
-
-        collider2d.enabled = false;
-
-        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-
-        Invoke("DeActive", 5);
+        ChangeState(damagedState);
     }
 
     private void DeActive()
