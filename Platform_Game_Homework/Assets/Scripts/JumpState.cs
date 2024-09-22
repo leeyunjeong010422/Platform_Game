@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class JumpState : IPlayerState
 {
-    public void Enter(PlayerController player)
+    public override void Enter(PlayerController player)
     {
         player.SetAnimation(PlayerController.jumpHash);
-        player.PerformJump();
+        PerformJump(player);
     }
 
-    public void Update(PlayerController player)
+    public override void Update(PlayerController player)
     {
         if (player.IsGrounded())
         {
@@ -16,5 +16,9 @@ public class JumpState : IPlayerState
         }
     }
 
-    public void Exit(PlayerController player) { }
+    private void PerformJump(PlayerController player)
+    {
+        player.rigid.AddForce(Vector2.up * player.jumpPower, ForceMode2D.Impulse);
+        player.isGrounded = false;
+    }
 }

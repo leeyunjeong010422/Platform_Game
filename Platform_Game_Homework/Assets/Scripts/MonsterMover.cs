@@ -11,8 +11,6 @@ public class MonsterMover : MonoBehaviour
     public float speed;
 
     private MonsterStateBase currentState;
-    private RandomMoveState_M randomState = new RandomMoveState_M();
-    private DamagedState_M damagedState = new DamagedState_M();
 
     private void Awake()
     {
@@ -21,12 +19,13 @@ public class MonsterMover : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         collider2d = GetComponent<CircleCollider2D>();
 
-        ChangeState(randomState);
+        ChangeState(new RandomMoveState_M());
     }
 
     private void FixedUpdate()
     {
         currentState.Update(this);
+        CheckPlayerDistance();
     }
 
     public void ChangeState(MonsterStateBase newState)
@@ -58,11 +57,27 @@ public class MonsterMover : MonoBehaviour
 
     public void OnDamaged()
     {
-        ChangeState(damagedState);
+        ChangeState(new DamagedState_M());
     }
 
     private void DeActive()
     {
         gameObject.SetActive(false);
+    }
+
+    private void CheckPlayerDistance()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null) return;
+
+        float distance = Vector2.Distance(transform.position, player.transform.position);
+        if (distance < 1f)
+        {
+            ChangeState(new AttackState_M());
+        }
+        else if (distance < 3f)
+        {
+            ChangeState(new ChaseState_M());
+        }
     }
 }
